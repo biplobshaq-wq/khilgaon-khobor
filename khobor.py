@@ -3,7 +3,7 @@ import json, re, os, html, urllib.parse, urllib.request, xml.etree.ElementTree a
 from datetime import datetime, timezone, timedelta
 from email.utils import parsedate_to_datetime
 BD = timezone(timedelta(hours=6))
-AREAS = ['খিলগাঁও','খিলগাঁওয়ে','খিলগাঁয়ে','Khilgaon','তালতলা','গোড়ান','মেরাদিয়া','বাসাবো','সিপাহীবাগ','নন্দীপাড়া','ত্রিমোহনী','নাসিরাবাদ']
+AREAS = ['খিলগাঁও','খিলগাঁয়ে','খিলগাও','Khilgaon','khilgaon']
 KEYS = ['মিলাদ','দোয়া','দোআ','চেহলাম','চল্লিশা','কুলখানি','মৃত্যুবার্ষিকী','মৃত্যু বার্ষিকী','উদ্বোধন','তবারক','তাবারক','তবরুক','মেজবান','মেজবানি','জেয়াফত','জিয়াফত','শিরনি','ভোজ','ওরস','মাহফিল','ইফতার','খাবার বিতরণ','কাঙালি','স্মরণসভা','শোকসভা','জন্মবার্ষিকী','পাগড়ি','ওয়াজ','বার্ষিকী','অনুষ্ঠান','সমাপনী','দাওয়াত','জানাজা']
 QUERIES = ['খিলগাঁও', 'খিলগাঁওয়ে', 'Khilgaon'] + ['খিলগাঁও ' + k for k in ['মিলাদ','দোয়া মাহফিল','চেহলাম','কুলখানি','মৃত্যুবার্ষিকী','উদ্বোধন','তবারক','মেজবান','মাহফিল','খাবার বিতরণ']]
 UA = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/124 Safari/537.36'}
@@ -24,6 +24,7 @@ for q in QUERIES:
         t = clean(it.findtext('title')); link = it.findtext('link') or ''
         desc = clean(it.findtext('description'))
         txt = t + ' ' + desc
+        if not any(a in t for a in AREAS): continue  # Khilgaon must be in the headline
         if any(x in txt for x in ['পূবাইল','গাজীপুর','টঙ্গী']): continue
         hit = [k for k in KEYS if k in txt]
         if not hit: continue
@@ -58,7 +59,7 @@ h1{{font-size:22px;margin:6px 0}} .u{{color:#666;font-size:14px;margin-bottom:12
 .d{{font-size:13px;color:#777}} .t{{font-size:17px;font-weight:600;margin:4px 0}} .k{{font-size:13px;color:#2a7}}
 .s{{background:#e33;color:#fff;border-radius:6px;padding:1px 6px;font-size:12px}} .n{{background:#36c;color:#fff;border-radius:6px;padding:1px 6px;font-size:12px}}
 .e{{background:#fff;padding:16px;border-radius:12px}}</style></head><body>
-<h1>🕌 খিলগাঁও অনুষ্ঠানের খবর</h1><div class=u>মিলাদ · দোয়া · চেহলাম · কুলখানি · মৃত্যুবার্ষিকী · উদ্বোধন · মেজবান<br>শেষ খোঁজা: {bd(now.isoformat())}, {now.strftime('%I:%M %p').translate(BN)} (প্রতি ৬ ঘণ্টায় নিজে থেকে খোঁজে)</div>
+<h1>🕌 খিলগাঁও অনুষ্ঠানের খবর</h1><div class=u>শুধু খিলগাঁও (ঢাকা)<br>মিলাদ · দোয়া · চেহলাম · কুলখানি · মৃত্যুবার্ষিকী · উদ্বোধন · মেজবান<br>শেষ খোঁজা: {bd(now.isoformat())}, {now.strftime('%I:%M %p').translate(BN)} (প্রতি ৬ ঘণ্টায় নিজে থেকে খোঁজে)</div>
 {rows}</body></html>"""
 open('index.html', 'w', encoding='utf-8').write(page)
 print(len(items), 'items')
